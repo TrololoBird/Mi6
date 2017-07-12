@@ -1459,12 +1459,12 @@ struct ipa_ioc_nat_dma_cmd {
 };
 
 /**
-* struct ipa_ioc_nat_pdn_entry - PDN entry modification data
-* @pdn_index: index of the entry in the PDN config table to be changed
-* @public_ip: PDN's public ip
-* @src_metadata: PDN's source NAT metadata for metadata replacement
-* @dst_metadata: PDN's destination NAT metadata for metadata replacement
-*/
+ * struct ipa_ioc_nat_pdn_entry - PDN entry modification data
+ * @pdn_index: index of the entry in the PDN config table to be changed
+ * @public_ip: PDN's public ip
+ * @src_metadata: PDN's source NAT metadata for metadata replacement
+ * @dst_metadata: PDN's destination NAT metadata for metadata replacement
+ */
 struct ipa_ioc_nat_pdn_entry {
 	uint8_t pdn_index;
 	uint32_t public_ip;
