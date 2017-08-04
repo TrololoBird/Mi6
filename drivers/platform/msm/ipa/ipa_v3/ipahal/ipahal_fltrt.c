@@ -1036,6 +1036,7 @@ static int ipa_fltrt_generate_hw_rule_bdy_ip6(u16 *en_rule,
 		ihl_ofst_meq32 += 2;
 	}
 
+<<<<<<< HEAD
 	if (attrib->attrib_mask & IPA_FLT_L2TP_INNER_IP_TYPE) {
 		if (IPA_IS_RAN_OUT_OF_EQ(ipa3_0_ihl_ofst_meq32,
 			ihl_ofst_meq32)) {
@@ -1069,6 +1070,8 @@ static int ipa_fltrt_generate_hw_rule_bdy_ip6(u16 *en_rule,
 		ihl_ofst_meq32++;
 	}
 
+=======
+>>>>>>> 80cdd5ae4bf1... msm: ipa: add new IP filtering bitmaps
 	if (attrib->attrib_mask & IPA_FLT_META_DATA) {
 		*en_rule |= IPA_GET_RULE_EQ_BIT_PTRN(IPA_METADATA_COMPARE);
 		rest = ipa_write_32(attrib->meta_data_mask, rest);
@@ -2037,6 +2040,7 @@ static int ipa_flt_generate_eq_ip6(enum ipa_ip_type ip,
 		ihl_ofst_meq32 += 2;
 	}
 
+<<<<<<< HEAD
 	if (attrib->attrib_mask & IPA_FLT_L2TP_INNER_IP_TYPE) {
 		if (IPA_IS_RAN_OUT_OF_EQ(ipa3_0_ihl_ofst_meq32,
 			ihl_ofst_meq32)) {
@@ -2071,6 +2075,8 @@ static int ipa_flt_generate_eq_ip6(enum ipa_ip_type ip,
 		ihl_ofst_meq32++;
 	}
 
+=======
+>>>>>>> 80cdd5ae4bf1... msm: ipa: add new IP filtering bitmaps
 	if (attrib->attrib_mask & IPA_FLT_MAC_ETHER_TYPE) {
 		if (IPA_IS_RAN_OUT_OF_EQ(ipa3_0_ofst_meq32, ofst_meq32)) {
 			IPAHAL_ERR_RL("ran out of meq32 eq\n");

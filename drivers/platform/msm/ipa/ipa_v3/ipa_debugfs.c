@@ -515,6 +515,7 @@ static int ipa3_attrib_dump(struct ipa_rule_attrib *attrib,
 	if (attrib->attrib_mask & IPA_FLT_TCP_SYN_L2TP)
 		pr_err("tcp syn l2tp ");
 
+<<<<<<< HEAD
 	if (attrib->attrib_mask & IPA_FLT_L2TP_INNER_IP_TYPE)
 		pr_err("l2tp inner ip type: %d ", attrib->type);
 
@@ -524,6 +525,8 @@ static int ipa3_attrib_dump(struct ipa_rule_attrib *attrib,
 		pr_err("dst_addr:%pI4 dst_addr_mask:%pI4 ", addr, mask);
 	}
 
+=======
+>>>>>>> 80cdd5ae4bf1... msm: ipa: add new IP filtering bitmaps
 	pr_err("\n");
 	return 0;
 }
