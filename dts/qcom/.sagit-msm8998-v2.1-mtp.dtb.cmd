@@ -1,0 +1,94 @@
+cmd_arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb := mkdir -p arch/arm64/boot/dts/qcom/ ; /usr/local/bin/ccache /root/toolchains/gnu-gcc-8.x-arm64/bin/aarch64-opt-linux-android-gcc -E -Wp,-MD,arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.d.pre.tmp -nostdinc -I/root/linux/sagit/arch/arm64/boot/dts -I/root/linux/sagit/arch/arm64/boot/dts/include -I/root/linux/sagit/drivers/of/testcase-data -undef -D__DTS__ -x assembler-with-cpp -o arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.dts.tmp /root/linux/sagit/arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dts ; ./scripts/dtc/dtc -O dtb -o arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb -b 0 -i /root/linux/sagit/arch/arm64/boot/dts/qcom/  -d arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.d.dtc.tmp arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.dts.tmp ; cat arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.d.pre.tmp arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.d.dtc.tmp > arch/arm64/boot/dts/qcom/.sagit-msm8998-v2.1-mtp.dtb.d
+
+source_arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb := /root/linux/sagit/arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dts
+
+deps_arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb := \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-v2.1.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-v2.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/skeleton64.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/clock/msm-clocks-8998.h \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/clock/audio-ext-clk.h \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/regulator/qcom,rpm-smd-regulator.h \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/interrupt-controller/arm-gic.h \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/interrupt-controller/irq.h \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-smp2p.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-gdsc-8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-pm8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/spmi/spmi.h \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/msm/power-on.h \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-pmi8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-pm8005.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-pm8998-rpm-regulator.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-regulator.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-pm.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-arm-smmu-8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/include/dt-bindings/msm/msm-bus-ids.h \
+    $(wildcard include/config/noc.h) \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-arm-smmu-impl-defs-8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-ion.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-camera.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-vidc.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-coresight.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-bus.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-gpu.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-pinctrl.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-audio-lpass.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-mdss.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-mdss-pll.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-rdbg.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-blsp.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-audio.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-wsa881x.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-wcd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm-smb138x.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-sde.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-sde-display.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/msm8998-v2-camera.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-v2.1.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-v2.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/sagit-msm8998-mtp.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../msm8998-pinctrl.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-pinctrl.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm-pm8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm-pmi8998.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-regulator.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-camera.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../msm8998-mdss-panels.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-dualmipi-wqxga-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-dualmipi-wqxga-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-truly-dualmipi-wqxga-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-truly-dualmipi-wqxga-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-dsc-wqxga-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt35597-dsc-wqxga-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sharp-dsc-4k-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sharp-dsc-4k-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-jdi-dualmipi-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-jdi-dualmipi-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sharp-1080p-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-jdi-1080p-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sharp-dualmipi-1080p-120hz.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-jdi-a407-dualmipi-wqhd-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sim-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sim-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sim-dualmipi-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-sim-dualmipi-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-s6e3ha3-amoled-dualmipi-wqhd-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/../dsi-panel-nt36850-truly-dualmipi-wqhd-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-mdss-panels.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/dsi-panel-jdi-fhd-r63452-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/dsi-panel-lgd-fhd-td4322-cmd.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/dsi-panel-jdi-fhd-nt35596s-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/dsi-panel-jdi-fhd-nt35596s-pro-video.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-blsp.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-audio.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/msm8998-mdss.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/sagit-camera-sensor-mtp.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/batterydata-sagit-atl-3350mAh.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/batterydata-sagit-sdi-3440mAh.dtsi \
+  /root/linux/sagit/arch/arm64/boot/dts/qcom/xiaomi/batterydata-itech-3020mAh.dtsi \
+
+arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb: $(deps_arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb)
+
+$(deps_arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb):

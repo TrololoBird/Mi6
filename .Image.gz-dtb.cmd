@@ -1,0 +1,1 @@
+cmd_arch/arm64/boot/Image.gz-dtb := (cat arch/arm64/boot/Image.gz arch/arm64/boot/dts/qcom/sagit-msm8998-mtp.dtb arch/arm64/boot/dts/qcom/sagit-msm8998-v2.1-mtp.dtb arch/arm64/boot/dts/qcom/sagit-msm8998-v2-mtp.dtb > arch/arm64/boot/Image.gz-dtb) || (rm -f arch/arm64/boot/Image.gz-dtb; false)

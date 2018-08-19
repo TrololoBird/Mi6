@@ -1,0 +1,1 @@
+cmd_arch/arm64/boot/Image := /usr/local/bin/ccache /root/toolchains/gnu-gcc-8.x-arm64/bin/aarch64-opt-linux-android-objcopy -O binary -R .note -R .note.gnu.build-id -R .comment -S  vmlinux arch/arm64/boot/Image
