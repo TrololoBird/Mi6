@@ -177,6 +177,7 @@ static struct clk_freq_tbl ftbl_gfx3d_clk_src_v2[] = {
 };
 
 static struct clk_freq_tbl ftbl_gfx3d_clk_src_vq[] = {
+	F_SLEW( 171000000,  342000000, gpu_pll0_pll_out_even,    1, 0, 0),
 	F_SLEW( 265000000,  530000000, gpu_pll0_pll_out_even,    1, 0, 0),
 	F_SLEW( 358000000,  716000000, gpu_pll0_pll_out_even,    1, 0, 0),
 	F_SLEW( 434000000,  868000000, gpu_pll0_pll_out_even,    1, 0, 0),
@@ -612,7 +613,7 @@ static void msm_gfxcc_hamster_fixup(void)
 static void msm_gfxcc_8998_v2_fixup(void)
 {
 	gpu_pll0_pll.c.fmax[VDD_DIG_MIN] = 1420000500;
-	gfx3d_clk_src.freq_tbl = ftbl_gfx3d_clk_src_v2;
+	gfx3d_clk_src.freq_tbl = ftbl_gfx3d_clk_src_vq;
 }
 
 int msm_gfxcc_8998_probe(struct platform_device *pdev)
