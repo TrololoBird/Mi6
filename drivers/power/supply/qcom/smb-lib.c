@@ -1929,6 +1929,7 @@ int smblib_set_prop_batt_capacity(struct smb_charger *chg,
 	return 0;
 }
 
+/*
 #ifdef CONFIG_MACH_XIAOMI_MSM8998
 #define SCREEN_ON_ICL		1600000
 #define SCREEN_ON_CHECK_MS	90000
@@ -2002,6 +2003,7 @@ end:
 	return NOTIFY_OK;
 }
 #endif
+*/
 
 #ifdef CONFIG_MACH_XIAOMI_MSM8998
 #define MAX_CURRENT_PERCENT		100
@@ -5042,9 +5044,11 @@ int smblib_init(struct smb_charger *chg)
 	INIT_WORK(&chg->legacy_detection_work, smblib_legacy_detection_work);
 	INIT_DELAYED_WORK(&chg->uusb_otg_work, smblib_uusb_otg_work);
 	INIT_DELAYED_WORK(&chg->bb_removal_work, smblib_bb_removal_work);
+/*
 #ifdef CONFIG_MACH_XIAOMI_MSM8998
 	INIT_DELAYED_WORK(&chg->fb_state_work, smblib_fb_state_work);
 #endif
+*/
 
 	chg->fake_capacity = -EINVAL;
 	chg->fake_input_current_limited = -EINVAL;
@@ -5079,7 +5083,8 @@ int smblib_init(struct smb_charger *chg)
 				"Couldn't register notifier rc=%d\n", rc);
 			return rc;
 		}
-
+		
+/*
 #ifdef CONFIG_MACH_XIAOMI_MSM8998
 		chg->fb_state_notifier.notifier_call = smblib_fb_state_cb;
 		rc = fb_register_client(&chg->fb_state_notifier);
@@ -5089,7 +5094,7 @@ int smblib_init(struct smb_charger *chg)
 			return rc;
 		}
 #endif
-
+*/
 		chg->bms_psy = power_supply_get_by_name("bms");
 		chg->pl.psy = power_supply_get_by_name("parallel");
 		break;
