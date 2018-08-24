@@ -24,6 +24,9 @@ KBUILD_DEFCONFIG := defconfig
 # Check for binutils support for specific extensions
 lseinstr := $(call as-instr,.arch_extension lse,-DCONFIG_AS_LSE=1)
 
+KBUILD_CFLAGS	+= $(call cc-option,-march=armv8-a+crypto+crc,) \
+	$(call cc-option,-mcpu=cortex-a53+crypto+crc,)
+
 ifeq ($(CONFIG_ARM64_LSE_ATOMICS), y)
   ifeq ($(lseinstr),)
 $(warning LSE atomics not supported by binutils)
@@ -66,7 +69,11 @@ KBUILD_CFLAGS	+= $(call clang-ifversion, -ge, 0600, -mgeneral-regs-only, -mno-im
 else
 KBUILD_CFLAGS	+= -mgeneral-regs-only
 endif
+
+KBUILD_CFLAGS	+= -O3
+
 KBUILD_CFLAGS	+= $(lseinstr) $(vdso32)
+KBUILD_CFLAGS	+= -mgeneral-regs-only
 KBUILD_CFLAGS	+= -fno-pic
 KBUILD_CFLAGS	+= $(call cc-option, -mpc-relative-literal-loads)
 KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
