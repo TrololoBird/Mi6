@@ -2000,8 +2000,8 @@ end:
 
 #ifdef CONFIG_MACH_XIAOMI_MSM8998
 #define MAX_CURRENT_PERCENT		100
-#define HIGH_CURRENT_PERCENT		80
-#define MEDIUM_CURRENT_PERCENT		55
+#define HIGH_CURRENT_PERCENT		70
+#define MEDIUM_CURRENT_PERCENT		50
 #endif
 int smblib_set_prop_system_temp_level(struct smb_charger *chg,
 				const union power_supply_propval *val)
