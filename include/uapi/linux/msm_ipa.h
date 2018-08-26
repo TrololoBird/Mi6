@@ -461,13 +461,6 @@ enum ipa_ssr_event {
 	IPA_SSR_EVENT_MAX
 };
 
-enum ipa_wlan_fw_ssr_event {
-	WLAN_FWR_SSR_BEFORE_SHUTDOWN = IPA_SSR_EVENT_MAX,
-	IPA_WLAN_FW_SSR_EVENT_MAX,
-#define IPA_WLAN_FW_SSR_EVENT_MAX IPA_WLAN_FW_SSR_EVENT_MAX
-};
-
-
 enum ipa_vlan_l2tp_event {
 	ADD_VLAN_IFACE = IPA_SSR_EVENT_MAX,
 	DEL_VLAN_IFACE,
