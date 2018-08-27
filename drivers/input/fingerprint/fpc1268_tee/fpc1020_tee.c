@@ -18,7 +18,7 @@
  *
  *
  * Copyright (c) 2015 Fingerprint Cards AB <tech@fingerprints.com>
- * Copyright (C) 2017 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License Version 2
@@ -39,10 +39,16 @@
 #include <linux/regulator/consumer.h>
 #include <linux/slab.h>
 #include <linux/wakelock.h>
+//#include <linux/hwinfo.h>
+#include <linux/notifier.h>
+#include <linux/fb.h>
+#include <linux/mdss_io_util.h>
+#include <linux/input.h>
 
 #define FPC1020_NAME "fpc1020"
 
 #define FPC_TTW_HOLD_TIME 2000
+#define FP_UNLOCK_REJECTION_TIMEOUT (FPC_TTW_HOLD_TIME - 500)
 
 #define RESET_LOW_SLEEP_MIN_US 5000
 #define RESET_LOW_SLEEP_MAX_US (RESET_LOW_SLEEP_MIN_US + 100)
@@ -54,6 +60,9 @@
 #define PWR_ON_SLEEP_MAX_US (PWR_ON_SLEEP_MIN_US + 900)
 
 #define NUM_PARAMS_REG_ENABLE_SET 2
+
+/* Unused key value to avoid interfering with active keys */
+#define KEY_FINGERPRINT 0x2ee
 
 static const char * const pctl_names[] = {
 	"fpc1020_reset_reset",
@@ -86,6 +95,12 @@ struct fpc1020_data {
 	bool prepared;
 	atomic_t wakeup_enabled; /* Used both in ISR and non-ISR */
 	int irqf;
+	struct notifier_block fb_notifier;
+	bool fb_black;
+	bool wait_finger_down;
+	struct work_struct work;
+	struct work_struct pm_work;
+	struct input_dev	*input_dev;
 
 	struct input_handler input_handler;
 	bool report_key_events;
@@ -474,12 +489,16 @@ static ssize_t device_prepare_set(struct device *dev,
 	int rc;
 	struct fpc1020_data *fpc1020 = dev_get_drvdata(dev);
 
-	if (!strncmp(buf, "enable", strlen("enable")))
+	if (!strncmp(buf, "enable", strlen("enable"))) {
 		rc = device_prepare(fpc1020, true);
-	else if (!strncmp(buf, "disable", strlen("disable")))
+
+
+	} else if (!strncmp(buf, "disable", strlen("disable"))) {
 		rc = device_prepare(fpc1020, false);
-	else
+//		update_hardware_info(TYPE_FP, 0);
+	} else {
 		return -EINVAL;
+	}
 
 	return rc ? rc : count;
 }
@@ -496,6 +515,14 @@ static ssize_t wakeup_enable_set(struct device *dev,
 	ssize_t ret = count;
 
 	mutex_lock(&fpc1020->lock);
+/*
+	if (!strncmp(buf, "enable", strlen("enable")))
+		atomic_set(&fpc1020->wakeup_enabled, 1);
+	else if (!strncmp(buf, "disable", strlen("disable")))
+		atomic_set(&fpc1020->wakeup_enabled, 0);
+	else
+		ret = -EINVAL;
+*/
 	mutex_unlock(&fpc1020->lock);
 
 	return ret;
@@ -532,6 +559,24 @@ static ssize_t irq_ack(struct device *dev,
 }
 static DEVICE_ATTR(irq, S_IRUSR | S_IWUSR, irq_get, irq_ack);
 
+static ssize_t fingerdown_wait_set(struct device *dev,
+	struct device_attribute *attr,
+	const char *buf, size_t count)
+{
+	struct fpc1020_data *fpc1020 = dev_get_drvdata(dev);
+
+	dev_dbg(fpc1020->dev, "%s\n", __func__);
+	if (!strncmp(buf, "enable", strlen("enable")) && fpc1020->prepared)
+		fpc1020->wait_finger_down = true;
+	else if (!strncmp(buf, "disable", strlen("disable")) && fpc1020->prepared)
+		fpc1020->wait_finger_down = false;
+	else
+		return -EINVAL;
+
+	return count;
+}
+static DEVICE_ATTR(fingerdown_wait, S_IWUSR, NULL, fingerdown_wait_set);
+
 static ssize_t irq_enable_set(struct device *dev,
 	struct device_attribute *attr,
 	const char *buf, size_t count)
@@ -553,7 +598,7 @@ static ssize_t irq_enable_set(struct device *dev,
 
 	return rc ? rc : count;
 }
-static DEVICE_ATTR(irq_enable, S_IWUSR | S_IRUSR | S_IRGRP | S_IWGRP , NULL, irq_enable_set);
+static DEVICE_ATTR(irq_enable, S_IWUSR | S_IRUSR | S_IRGRP | S_IWGRP, NULL, irq_enable_set);
 
 static struct attribute *attributes[] = {
 	&dev_attr_pinctl_set.attr,
@@ -565,12 +610,96 @@ static struct attribute *attributes[] = {
 	&dev_attr_clk_enable.attr,
 	&dev_attr_irq_enable.attr,
 	&dev_attr_irq.attr,
+	&dev_attr_fingerdown_wait.attr,
 	NULL
 };
+
+int fpc1020_input_init(struct fpc1020_data *fpc1020)
+{
+	int error = 0;
+
+
+	dev_dbg(fpc1020->dev, "%s\n", __func__);
+
+	fpc1020->input_dev = input_allocate_device();
+
+	if (!fpc1020->input_dev) {
+		dev_err(fpc1020->dev, "Input_allocate_device failed.\n");
+		error  = -ENOMEM;
+	}
+
+	if (!error) {
+		fpc1020->input_dev->name = "fpc1020";
+
+		/* Set event bits according to what events we are generating */
+		set_bit(EV_KEY, fpc1020->input_dev->evbit);
+
+        set_bit(KEY_POWER, fpc1020->input_dev->keybit);
+        set_bit(KEY_F2, fpc1020->input_dev->keybit);
+        set_bit(KEY_HOME, fpc1020->input_dev->keybit);
+	set_bit(KEY_FINGERPRINT, fpc1020->input_dev->keybit);
+
+		/* Register the input device */
+		error = input_register_device(fpc1020->input_dev);
+
+
+		if (error) {
+			dev_err(fpc1020->dev, "Input_register_device failed.\n");
+			input_free_device(fpc1020->input_dev);
+			fpc1020->input_dev = NULL;
+		}
+	}
+
+	return error;
+}
+
+void fpc1020_input_destroy(struct fpc1020_data *fpc1020)
+{
+	dev_dbg(fpc1020->dev, "%s\n", __func__);
+
+	if (fpc1020->input_dev != NULL)
+		input_free_device(fpc1020->input_dev);
+}
 
 static const struct attribute_group attribute_group = {
 	.attrs = attributes,
 };
+
+//static void notification_work(struct work_struct *work)
+//{
+//	mdss_prim_panel_fb_unblank(FP_UNLOCK_REJECTION_TIMEOUT);
+//	pr_debug("unblank\n");
+//}
+
+static void set_fingerprintd_nice(int nice)
+{
+	struct task_struct *p;
+
+	read_lock(&tasklist_lock);
+	for_each_process(p) {
+		if (!memcmp(p->comm, "fingerprintd", 13)) {
+			set_user_nice(p, nice);
+			break;
+		}
+	}
+	read_unlock(&tasklist_lock);
+}
+
+static void fpc1020_suspend_resume(struct work_struct *work)
+{
+	struct fpc1020_data *fpc1020 =
+		container_of(work, typeof(*fpc1020), pm_work);
+
+	/*
+	 * Elevate fingerprintd priority when screen is off to ensure
+	 * the fingerprint sensor is responsive and that the haptic
+	 * response on successful verification always fires.
+	 */
+	if (!fpc1020->fb_black)
+		set_fingerprintd_nice(0);
+	else
+		set_fingerprintd_nice(-1);
+}
 
 static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 {
@@ -578,12 +707,23 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	dev_dbg(fpc1020->dev, "%s\n", __func__);
 
-	if (atomic_read(&fpc1020->wakeup_enabled)) {
+	if (fpc1020->fb_black && atomic_read(&fpc1020->wakeup_enabled)) {
 		wake_lock_timeout(&fpc1020->ttw_wl,
 					msecs_to_jiffies(FPC_TTW_HOLD_TIME));
+		
+		/* Report button input to trigger CPU boost */
+		input_report_key(fpc1020->input_dev, KEY_FINGERPRINT, 1);
+		input_sync(fpc1020->input_dev);
+		input_report_key(fpc1020->input_dev, KEY_FINGERPRINT, 0);
+		input_sync(fpc1020->input_dev);
 	}
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL, dev_attr_irq.attr.name);
+	if (fpc1020->wait_finger_down && fpc1020->fb_black && fpc1020->prepared) {
+		pr_debug("%s enter\n", __func__);
+		fpc1020->wait_finger_down = false;
+		schedule_work(&fpc1020->work);
+	}
 
 	return IRQ_HANDLED;
 }
@@ -610,6 +750,46 @@ static int fpc1020_request_named_gpio(struct fpc1020_data *fpc1020,
 
 	return 0;
 }
+
+static int fpc_fb_notif_callback(struct notifier_block *nb,
+		unsigned long val, void *data)
+{
+	struct fpc1020_data *fpc1020 = container_of(nb, struct fpc1020_data,
+			fb_notifier);
+	struct fb_event *evdata = data;
+	unsigned int blank;
+
+	if (!fpc1020)
+		return 0;
+
+	if (val != FB_EVENT_BLANK || fpc1020->prepared == false)
+		return 0;
+
+	pr_debug("[info] %s value = %d\n", __func__, (int)val);
+
+	if (evdata && evdata->data && val == FB_EVENT_BLANK) {
+		blank = *(int *)(evdata->data);
+		switch (blank) {
+		case FB_BLANK_POWERDOWN:
+			fpc1020->fb_black = true;
+			queue_work(system_highpri_wq, &fpc1020->pm_work);
+			break;
+		case FB_BLANK_UNBLANK:
+			fpc1020->fb_black = false;
+			queue_work(system_highpri_wq, &fpc1020->pm_work);
+			break;
+		default:
+			pr_debug("%s defalut\n", __func__);
+			break;
+		}
+	}
+	return NOTIFY_OK;
+}
+
+
+static struct notifier_block fpc_notif_block = {
+	.notifier_call = fpc_fb_notif_callback,
+};
 
 static int fpc1020_probe(struct platform_device *pdev)
 {
@@ -665,6 +845,12 @@ static int fpc1020_probe(struct platform_device *pdev)
 
 	atomic_set(&fpc1020->wakeup_enabled, 1);
 
+	rc = fpc1020_input_init(fpc1020);
+    if (rc)
+		goto exit;
+
+	INIT_WORK(&fpc1020->pm_work, fpc1020_suspend_resume);
+
 	fpc1020->irqf = IRQF_TRIGGER_RISING | IRQF_ONESHOT | IRQF_PERF_CRITICAL | IRQF_NO_SUSPEND;
 	device_init_wakeup(dev, 1);
 	mutex_init(&fpc1020->lock);
@@ -695,6 +881,12 @@ static int fpc1020_probe(struct platform_device *pdev)
 		(void)device_prepare(fpc1020, true);
 	}
 	dev_info(dev, "%s: ok\n", __func__);
+	fpc1020->fb_black = false;
+	fpc1020->wait_finger_down = false;
+//	INIT_WORK(&fpc1020->work, notification_work);
+	fpc1020->fb_notifier = fpc_notif_block;
+	fb_register_client(&fpc1020->fb_notifier);
+
 exit:
 	return rc;
 }
@@ -703,6 +895,7 @@ static int fpc1020_remove(struct platform_device *pdev)
 {
 	struct fpc1020_data *fpc1020 = platform_get_drvdata(pdev);
 
+	fb_unregister_client(&fpc1020->fb_notifier);
 	sysfs_remove_group(&pdev->dev.kobj, &attribute_group);
 	mutex_destroy(&fpc1020->lock);
 	wake_lock_destroy(&fpc1020->ttw_wl);
