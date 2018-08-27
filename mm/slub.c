@@ -448,7 +448,7 @@ static int slub_debug = DEBUG_DEFAULT_FLAGS;
 #elif defined(CONFIG_KASAN)
 static int slub_debug = SLAB_STORE_USER;
 #else
-static int slub_debug;
+static int slub_debug = 0;
 #endif
 
 static char *slub_debug_slabs;
@@ -1168,7 +1168,7 @@ fail:
 
 static int __init setup_slub_debug(char *str)
 {
-	slub_debug = DEBUG_DEFAULT_FLAGS;
+	slub_debug = 0;
 	if (*str++ != '=' || !*str)
 		/*
 		 * No options specified. Switch on full debugging.
@@ -1182,7 +1182,6 @@ static int __init setup_slub_debug(char *str)
 		 */
 		goto check_slabs;
 
-	slub_debug = 0;
 	if (*str == '-')
 		/*
 		 * Switch off all debugging measures.
